@@ -1,7 +1,7 @@
 import numpy as np # import numpy lib (矩陣運算用)
 import matplotlib.pyplot as plt # (畫圖用)
 # MachineLearning 我自己寫的lib
-from MachineLearning import Classifier # 高斯分類器其實就是QDC
+from MachineLearning import Classifier 
 from MachineLearning import DimensionReduction # 降維度
 '''
  產生兩組2維資料，各100個點

@@ -1,11 +1,9 @@
 import numpy as np
 class Regression(object):
-    def __init__(self):
-        self.R=1
-        
+    def __init__(self):pass
+  
     class LinearRegression(object):
-        def __init__(self):
-            self.R=1
+        def __init__(self):pass
         
         def LinearRegression_train(self,TrainingData, response):
             x=TrainingData
@@ -33,8 +31,7 @@ class Regression(object):
             return y_test_hat
        
     class RidgeRegression(object):
-        def __init__(self):
-            self.R=1
+        def __init__(self):pass
             
         def RidgeRegression_train(self,TrainingData, response,lamda):
             x=TrainingData

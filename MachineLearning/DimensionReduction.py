@@ -1,8 +1,7 @@
 import numpy as np
 from numpy import matlib
 class DimensionReduction(object):
-    def __init__(self):
-        self.R=1
+    def __init__(self): pass
         
     def PCA(self,data):
         Sigma=DimensionReduction.__get_CovarianceMatrix(data)

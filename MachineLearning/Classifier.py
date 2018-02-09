@@ -126,5 +126,49 @@ class Classifier(object):
                        
             Posterprobability=np.exp(logLikelihood)/np.transpose(np.matlib.repmat(np.transpose(np.sum(np.exp(logLikelihood),axis=1)),len(labelindex),1))
             return Posterprobability
-        
+
+    class NearestNeighbor(object):
+        def __init__(self,**kwargs): 
+            for name, value in kwargs.items():
+                if name == 'k': self.k=value
+            try:    self.k
+            except: 
+                self.k=3
+                print('kNN: k=3 by default')
+            
+            
+        def kNN(self,traindata,label_train,testdata):  
+            k=self.k
+            
+            Nx,dimx=np.shape(traindata)
+            Ny,dimy=np.shape(testdata)
+            
+            LabelIndex = np.unique(label_train)
+            nc = len(LabelIndex)
+            vote = np.zeros((Ny,nc))
+            
+            ## Count the distance between traindata and testdata ##
+            assemble=np.concatenate((testdata,traindata))
+            
+            temp=np.array(np.zeros((Nx+Ny,1)))
+            temp[:,0]=np.sum(assemble**2,axis=1)
+            
+            tmp1=np.kron(np.ones((1,Nx+Ny)),temp)
+            tmp2=np.kron(np.ones((Nx+Ny,1)),temp.transpose())
+            tmp12=np.dot(assemble,assemble.transpose())
+            dist=tmp1+tmp2-2*tmp12
+            d = dist[0:Ny,Ny:Ny+Nx]
+            sort_ind=d.argsort(axis=1)
+            id_temp=sort_ind.flatten()
+            
+            pre_label=label_train[id_temp]
+            
+            kNNlabel=np.reshape(pre_label,(Ny,Nx))
+            #### vote ###
+            Decisionlabel=np.zeros(Ny)
+            for i in range(Ny):
+                for j in range(k):
+                    vote[i,int(kNNlabel[i,j])] +=  1;
+                Decisionlabel[i]=LabelIndex[np.where(vote[i,:]==max(vote[i,:]))[0]]
+            return Decisionlabel
                     

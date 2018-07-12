@@ -10,6 +10,7 @@ https://www.kaggle.com/uciml/sms-spam-collection-dataset#spam.csv
 @author: Tommy Huang, chih.sheng.huang821@gmail.com
 """
 
+# 1.	首先我們先將資料匯入python內，我們會用到的pandas，pandas對處理這種文字資料滿好用的。
 import pandas as pd
 filepath='C:\\Users\\user\\Desktop/spam.csv'
 def readData_rawSMS(filepath):
@@ -18,8 +19,7 @@ def readData_rawSMS(filepath):
 	return data_rawSMS
 data_rawSMS = readData_rawSMS(filepath)
 
-
-
+#2.	將資料分成Train和Test
 import numpy as np
 def Separate_TrainAndTest(data_rawSMS):
     n=int(data_rawSMS.shape[0])
@@ -27,7 +27,7 @@ def Separate_TrainAndTest(data_rawSMS):
     return data_rawSMS.iloc[np.where(tmp_train==True)[0]], data_rawSMS.iloc[np.where(tmp_train==False)[0]]
 data_rawtrain,data_rawtest=Separate_TrainAndTest(data_rawSMS)
 
-
+#3. 從training data去著手算哪些「詞」重要。
 import re
 def generate_key_list(data_rawtrain, size_table=200,ignore=3):
     dict_spam_raw = dict()
@@ -66,7 +66,6 @@ def generate_key_list(data_rawtrain, size_table=200,ignore=3):
                 except:	
                     dict_IDF[find] = dict_IDF.get(find,1)
             word_set.add(find)
-
     word_df = pd.DataFrame(list(zip(dict_genuine_raw.keys(),dict_genuine_raw.values(),dict_spam_raw.values(),dict_IDF.values())))
     word_df.columns = ['keyword','genuine','spam','IDF']
     word_df['genuine'] = word_df['genuine'].astype('float')/data_rawtrain[data_rawtrain['label']=='genuine'].shape[0]
@@ -75,29 +74,20 @@ def generate_key_list(data_rawtrain, size_table=200,ignore=3):
     word_df['genuine_IDF'] = word_df['genuine']*word_df['IDF']
     word_df['spam_IDF'] = word_df['spam']*word_df['IDF']
     word_df['diff']=word_df['spam_IDF']-word_df['genuine_IDF']
-
-    selected_spam_key = word_df.sort_values('diff',ascending=False)
-    
-    
+    selected_spam_key = word_df.sort_values('diff',ascending=False)  
     keyword_dict = dict()
     i = 0
     for word in selected_spam_key.head(size_table).keyword:
         keyword_dict.update({word.strip():i})
         i+=1
     return keyword_dict   
-
 # build a tabu list based on the training data
 size_table = 300                 # how many features are used to classify spam
 word_len_ignored = 3            # ignore those words shorter than this variable
 keyword_dict=generate_key_list(data_rawtrain, size_table, word_len_ignored)
 
 
-
-
-
-
-
-
+# 4.將Train資料和Test資料轉換成特徵向量
 def convert_Content(content, keyword_dict):
 	m = len(keyword_dict)
 	res = np.int_(np.zeros(m))
@@ -128,7 +118,7 @@ def raw2feature(data_rawtrain,data_rawtest,keyword_dict):
 Train,Test=raw2feature(data_rawtrain,data_rawtest,keyword_dict)
 
 
-
+# 5.	依據特徵資料訓練分類器
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.naive_bayes import BernoulliNB       
 def learn(Train):
@@ -148,7 +138,7 @@ def learn(Train):
 # train the Random Forest and the Naive Bayes Model using training data
 model_NB,model_RF=learn(Train)
 
-
+# 6.依據訓練好的分類器，進行測試。
 def test(Test,model):
     Y_hat = model.predict(Test[0])
     n=np.size(Test[1])
@@ -157,14 +147,14 @@ def test(Test,model):
 test(Test,model_NB)
 test(Test,model_RF)
 
+#######
 def predictSMS(SMS,model,keyword_dict):
     X = convert_Content(SMS, keyword_dict)
     Y_hat = model.predict(X.reshape(1,-1))
     if int(Y_hat) == 1:
         print ('SPAM: {}'.format(SMS))
     else:
-        print ('GENUINE: {}'.format(SMS))
-        
+        print ('GENUINE: {}'.format(SMS))    
 
 inputstr='go to visit www.yahoo.com.tw, Buy one get one free, Hurry!'
 predictSMS(inputstr,model_NB,keyword_dict)

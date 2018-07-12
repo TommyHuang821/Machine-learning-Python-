@@ -2,7 +2,12 @@
 """
 Created on Thu May 31 11:21:44 2018
 
-@author: Tommy
+Machine learning Example for「SMS Spam Collection Dataset」
+Database Link:
+https://archive.ics.uci.edu/ml/datasets/sms+spam+collection
+https://www.kaggle.com/uciml/sms-spam-collection-dataset#spam.csv
+ 
+@author: Tommy Huang, chih.sheng.huang821@gmail.com
 """
 
 import pandas as pd
@@ -161,9 +166,9 @@ def predictSMS(SMS,model,keyword_dict):
         print ('GENUINE: {}'.format(SMS))
         
 
-# I select two messages from the test data here.
-inputstr='Free outgoingg calls to any number! Visit www.example.com to know more. Hurry!'
+inputstr='go to visit www.yahoo.com.tw, Buy one get one free, Hurry!'
 predictSMS(inputstr,model_NB,keyword_dict)
-inputstr=('Free call for anytime.')
+
+inputstr=('Call back for anytime.')
 predictSMS(inputstr,model_NB,keyword_dict)
 

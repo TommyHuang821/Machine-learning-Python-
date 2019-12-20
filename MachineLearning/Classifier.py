@@ -31,7 +31,7 @@ class Classifier(object):
                    the mechanism of partial segmentation would work. 
             '''
             if Ny>10000: 
-                P=(np.zeros([Ny,dim])) 
+                P=(np.zeros([Ny,len(labelindex)])) 
                 epoch=int(np.floor(Ny/10000))
                 for epo in range(epoch):
                     index=range(0+epo*10000,(1+epo)*10000)
